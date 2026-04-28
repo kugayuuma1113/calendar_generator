@@ -11,9 +11,9 @@ def create_db_and_subjects():
 
     # 追加したいデータのリスト
     subjects_data = [
-        {"name": "情報理論", "cat": "固有専門", "year": 2, "day": "月", "period": 1},
-        {"name": "計算機構造", "cat": "固有専門", "year": 2, "day": "月", "period": 2},
-        # ... 残りの50個
+        {"code":"53371","name": "情報理論", "cat": "固有専門", "year": 2, "day": "月", "period": 1},
+        {"code":"53372","name": "計算機構造", "cat": "固有専門", "year": 2, "day": "月", "period": 2},
+        
     ]
 
     with Session(engine) as session:
