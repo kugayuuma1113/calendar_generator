@@ -32,11 +32,11 @@
         crossorigin="anonymous"></script>
 </head>
 
-<body class="font-sans py-8 px-4">
+<body class="font-sans py-6 px-4">
 
     <!-- Header -->
-    <header class="max-w-7xl mx-auto mb-8">
-        <div class="glass rounded-2xl px-8 py-6">
+    <header class="max-w-screen-2xl mx-auto mb-6">
+        <div class="glass rounded-2xl px-8 py-5">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="flex items-center gap-3 mb-1">
@@ -57,12 +57,10 @@
     </header>
 
     <!-- Filter Section -->
-    <section class="max-w-7xl mx-auto mb-6">
-        <div class="glass rounded-2xl px-8 py-6">
-            <div class="glow-line mb-6"></div>
-
-            <form id="filter-form" hx-get="/api/subjects" hx-target="#timetable-body" hx-trigger="change"
-                hx-include="#filter-form" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <section class="max-w-screen-2xl mx-auto mb-4">
+        <div class="glass rounded-2xl px-8 py-5">
+            <div class="glow-line mb-5"></div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
                 <!-- 回生フィルター -->
                 <div>
@@ -113,18 +111,16 @@
                     </div>
                     <input type="hidden" name="regtype" id="regtype-value" value="">
                 </div>
-
-            </form>
-
-            <div class="glow-line mt-6"></div>
+            </div>
+            <div class="glow-line mt-5"></div>
         </div>
     </section>
 
-    <!-- Timetable -->
-    <main class="max-w-7xl mx-auto">
-        <div class="glass rounded-2xl overflow-hidden">
+    <!-- Main Content: Timetable + Side Panel -->
+    <main class="max-w-screen-2xl mx-auto flex gap-4">
 
-            <!-- Table Header Info -->
+        <!-- Timetable -->
+        <div class="glass rounded-2xl overflow-hidden flex-1 min-w-0">
             <div class="px-6 py-4 flex items-center justify-between border-b border-border">
                 <div class="flex items-center gap-2">
                     <div class="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
@@ -133,9 +129,8 @@
                 <span class="text-xs text-muted" id="filter-summary">1回生 / 全科目 / 全区分</span>
             </div>
 
-            <!-- Timetable Grid -->
-            <div class="overflow-x-auto p-6">
-                <table class="w-full border-collapse" style="min-width: 700px;">
+            <div class="overflow-x-auto p-4">
+                <table class="w-full border-collapse" style="min-width: 600px;">
                     <thead>
                         <tr>
                             <th class="header-period w-24 rounded-tl-lg p-4 text-center">時限</th>
@@ -146,142 +141,48 @@
                             <th class="header-day p-4 text-center rounded-tr-lg">金曜</th>
                         </tr>
                     </thead>
-                    <tbody id="timetable-body">
-                        <!-- 1時限 -->
+                    <tbody>
+                        {% set days = [('mon','月'), ('tue','火'), ('wed','水'), ('thu','木'), ('fri','金')] %}
+                        {% set periods = [
+                        (1, '8:45–10:15'),
+                        (2, '10:30–12:00'),
+                        (3, '13:00–14:30'),
+                        (4, '14:45–16:15'),
+                        (5, '16:30–18:00'),
+                        ] %}
+
+                        {% for period_num, period_time in periods %}
                         <tr>
-                            <td class="header-period p-4 text-center">
-                                <div class="font-bold text-base">1</div>
-                                <div class="period-time">8:45–10:15</div>
+                            <td class="header-period p-4 text-center {% if loop.last %}rounded-bl-lg{% endif %}">
+                                <div class="font-bold text-base">{{ period_num }}</div>
+                                <div class="period-time">{{ period_time }}</div>
                             </td>
-                            <td class="timetable-cell p-3" data-day="mon" data-period="1" hx-get="/api/subjects/mon/1"
-                                hx-target="this" hx-trigger="click">
+                            {% for day_key, day_jp in days %}
+                            {% set enrolled = enrolled_map.get((day_jp, period_num)) %}
+                            <td id="cell-{{ day_key }}-{{ period_num }}"
+                                class="timetable-cell p-2 {% if loop.last and period_num == 5 %}rounded-br-lg{% endif %}"
+                                data-day="{{ day_key }}" data-period="{{ period_num }}" {% if not enrolled %}
+                                onclick="openPanel('{{ day_key }}', {{ period_num }})" {% endif %}>
+                                {% if enrolled %}
+                                <div class="enrolled-card cat-bg-{{ enrolled.cat }}">
+                                    <p class="text-xs font-semibold leading-tight truncate text-slate-100">{{
+                                        enrolled.name }}</p>
+                                    <p class="text-xs mt-0.5 truncate text-slate-400">{{ enrolled.cat }}</p>
+                                    <form hx-delete="/api/enrollment/{{ enrolled.enrollment_id }}"
+                                        hx-target="#cell-{{ day_key }}-{{ period_num }}" hx-swap="innerHTML"
+                                        hx-confirm="「{{ enrolled.name }}」の履修を解除しますか？"
+                                        hx-on::after-request="if(event.detail.successful) restoreClick('{{ day_key }}', {{ period_num }})"
+                                        class="mt-1">
+                                        <button type="submit" class="unenroll-btn">解除</button>
+                                    </form>
+                                </div>
+                                {% else %}
                                 <div class="add-icon">＋</div>
+                                {% endif %}
                             </td>
-                            <td class="timetable-cell p-3" data-day="tue" data-period="1" hx-get="/api/subjects/tue/1"
-                                hx-target="this" hx-trigger="click">
-                                <div class="add-icon">＋</div>
-                            </td>
-                            <td class="timetable-cell p-3" data-day="wed" data-period="1" hx-get="/api/subjects/wed/1"
-                                hx-target="this" hx-trigger="click">
-                                <div class="add-icon">＋</div>
-                            </td>
-                            <td class="timetable-cell p-3" data-day="thu" data-period="1" hx-get="/api/subjects/thu/1"
-                                hx-target="this" hx-trigger="click">
-                                <div class="add-icon">＋</div>
-                            </td>
-                            <td class="timetable-cell p-3" data-day="fri" data-period="1" hx-get="/api/subjects/fri/1"
-                                hx-target="this" hx-trigger="click">
-                                <div class="add-icon">＋</div>
-                            </td>
+                            {% endfor %}
                         </tr>
-                        <!-- 2時限 -->
-                        <tr>
-                            <td class="header-period p-4 text-center">
-                                <div class="font-bold text-base">2</div>
-                                <div class="period-time">10:30–12:00</div>
-                            </td>
-                            <td class="timetable-cell p-3" data-day="mon" data-period="2" hx-get="/api/subjects/mon/2"
-                                hx-target="this" hx-trigger="click">
-                                <div class="add-icon">＋</div>
-                            </td>
-                            <td class="timetable-cell p-3" data-day="tue" data-period="2" hx-get="/api/subjects/tue/2"
-                                hx-target="this" hx-trigger="click">
-                                <div class="add-icon">＋</div>
-                            </td>
-                            <td class="timetable-cell p-3" data-day="wed" data-period="2" hx-get="/api/subjects/wed/2"
-                                hx-target="this" hx-trigger="click">
-                                <div class="add-icon">＋</div>
-                            </td>
-                            <td class="timetable-cell p-3" data-day="thu" data-period="2" hx-get="/api/subjects/thu/2"
-                                hx-target="this" hx-trigger="click">
-                                <div class="add-icon">＋</div>
-                            </td>
-                            <td class="timetable-cell p-3" data-day="fri" data-period="2" hx-get="/api/subjects/fri/2"
-                                hx-target="this" hx-trigger="click">
-                                <div class="add-icon">＋</div>
-                            </td>
-                        </tr>
-                        <!-- 3時限 -->
-                        <tr>
-                            <td class="header-period p-4 text-center">
-                                <div class="font-bold text-base">3</div>
-                                <div class="period-time">13:00–14:30</div>
-                            </td>
-                            <td class="timetable-cell p-3" data-day="mon" data-period="3" hx-get="/api/subjects/mon/3"
-                                hx-target="this" hx-trigger="click">
-                                <div class="add-icon">＋</div>
-                            </td>
-                            <td class="timetable-cell p-3" data-day="tue" data-period="3" hx-get="/api/subjects/tue/3"
-                                hx-target="this" hx-trigger="click">
-                                <div class="add-icon">＋</div>
-                            </td>
-                            <td class="timetable-cell p-3" data-day="wed" data-period="3" hx-get="/api/subjects/wed/3"
-                                hx-target="this" hx-trigger="click">
-                                <div class="add-icon">＋</div>
-                            </td>
-                            <td class="timetable-cell p-3" data-day="thu" data-period="3" hx-get="/api/subjects/thu/3"
-                                hx-target="this" hx-trigger="click">
-                                <div class="add-icon">＋</div>
-                            </td>
-                            <td class="timetable-cell p-3" data-day="fri" data-period="3" hx-get="/api/subjects/fri/3"
-                                hx-target="this" hx-trigger="click">
-                                <div class="add-icon">＋</div>
-                            </td>
-                        </tr>
-                        <!-- 4時限 -->
-                        <tr>
-                            <td class="header-period p-4 text-center">
-                                <div class="font-bold text-base">4</div>
-                                <div class="period-time">14:45–16:15</div>
-                            </td>
-                            <td class="timetable-cell p-3" data-day="mon" data-period="4" hx-get="/api/subjects/mon/4"
-                                hx-target="this" hx-trigger="click">
-                                <div class="add-icon">＋</div>
-                            </td>
-                            <td class="timetable-cell p-3" data-day="tue" data-period="4" hx-get="/api/subjects/tue/4"
-                                hx-target="this" hx-trigger="click">
-                                <div class="add-icon">＋</div>
-                            </td>
-                            <td class="timetable-cell p-3" data-day="wed" data-period="4" hx-get="/api/subjects/wed/4"
-                                hx-target="this" hx-trigger="click">
-                                <div class="add-icon">＋</div>
-                            </td>
-                            <td class="timetable-cell p-3" data-day="thu" data-period="4" hx-get="/api/subjects/thu/4"
-                                hx-target="this" hx-trigger="click">
-                                <div class="add-icon">＋</div>
-                            </td>
-                            <td class="timetable-cell p-3" data-day="fri" data-period="4" hx-get="/api/subjects/fri/4"
-                                hx-target="this" hx-trigger="click">
-                                <div class="add-icon">＋</div>
-                            </td>
-                        </tr>
-                        <!-- 5時限 -->
-                        <tr>
-                            <td class="header-period p-4 text-center rounded-bl-lg">
-                                <div class="font-bold text-base">5</div>
-                                <div class="period-time">16:30–18:00</div>
-                            </td>
-                            <td class="timetable-cell p-3" data-day="mon" data-period="5" hx-get="/api/subjects/mon/5"
-                                hx-target="this" hx-trigger="click">
-                                <div class="add-icon">＋</div>
-                            </td>
-                            <td class="timetable-cell p-3" data-day="tue" data-period="5" hx-get="/api/subjects/tue/5"
-                                hx-target="this" hx-trigger="click">
-                                <div class="add-icon">＋</div>
-                            </td>
-                            <td class="timetable-cell p-3" data-day="wed" data-period="5" hx-get="/api/subjects/wed/5"
-                                hx-target="this" hx-trigger="click">
-                                <div class="add-icon">＋</div>
-                            </td>
-                            <td class="timetable-cell p-3" data-day="thu" data-period="5" hx-get="/api/subjects/thu/5"
-                                hx-target="this" hx-trigger="click">
-                                <div class="add-icon">＋</div>
-                            </td>
-                            <td class="timetable-cell p-3 rounded-br-lg" data-day="fri" data-period="5"
-                                hx-get="/api/subjects/fri/5" hx-target="this" hx-trigger="click">
-                                <div class="add-icon">＋</div>
-                            </td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -290,30 +191,42 @@
             <div class="px-6 py-4 border-t border-border flex items-center gap-6 flex-wrap">
                 <span class="text-xs text-muted">凡例：</span>
                 <span class="flex items-center gap-2 text-xs text-muted">
-                    <span class="inline-block w-3 h-3 rounded" style="background:rgba(108,99,255,0.4);"></span>外国語
+                    <span class="inline-block w-3 h-3 rounded cat-bg-外国語"></span>外国語
                 </span>
                 <span class="flex items-center gap-2 text-xs text-muted">
-                    <span class="inline-block w-3 h-3 rounded" style="background:rgba(72,202,228,0.4);"></span>基礎専門
+                    <span class="inline-block w-3 h-3 rounded cat-bg-基礎専門"></span>基礎専門
                 </span>
                 <span class="flex items-center gap-2 text-xs text-muted">
-                    <span class="inline-block w-3 h-3 rounded" style="background:rgba(251,191,36,0.4);"></span>固有専門
+                    <span class="inline-block w-3 h-3 rounded cat-bg-固有専門"></span>固有専門
                 </span>
                 <span class="flex items-center gap-2 text-xs text-muted">
-                    <span class="inline-block w-3 h-3 rounded" style="background:rgba(52,211,153,0.4);"></span>教養
+                    <span class="inline-block w-3 h-3 rounded cat-bg-教養"></span>教養
                 </span>
-                <div class="ml-auto text-xs text-muted">クリックで科目を追加</div>
+                <div class="ml-auto text-xs text-muted">セルをクリックして科目を追加</div>
             </div>
         </div>
+
+        <!-- Side Panel: 科目選択 -->
+        <aside id="side-panel" class="glass rounded-2xl w-80 flex-shrink-0 hidden flex-col">
+            <div class="px-4 py-3 border-b border-border flex items-center justify-between">
+                <span class="text-sm font-semibold text-slate-200">科目を選択</span>
+                <button onclick="closePanel()"
+                    class="text-muted hover:text-slate-200 transition-colors text-xl leading-none">✕</button>
+            </div>
+            <div id="panel-content" class="flex-1 overflow-y-auto">
+                <p class="text-sm text-muted text-center py-12">コマをクリックして<br>科目を表示します</p>
+            </div>
+        </aside>
     </main>
 
-    <footer class="max-w-7xl mx-auto mt-6 text-center text-xs text-muted opacity-50">
+    <footer class="max-w-screen-2xl mx-auto mt-6 text-center text-xs text-muted opacity-50">
         時間割Generator &nbsp;·&nbsp; 大学履修管理システム
     </footer>
 
     <script>
+        // ── フィルター ──────────────────────────────────
         function toggleFilter(btn, group, isExclusive) {
             const groupBtns = document.querySelectorAll(`[data-group="${group}"]`);
-
             if (isExclusive) {
                 groupBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
@@ -327,33 +240,81 @@
                     const allBtn = document.querySelector(`[data-group="${group}"][data-value=""]`);
                     if (allBtn) allBtn.classList.remove('active');
                     btn.classList.toggle('active');
-
-                    const activeValues = [...document.querySelectorAll(`[data-group="${group}"].active`)]
-                        .map(b => b.dataset.value)
-                        .filter(v => v !== '');
-
-                    if (activeValues.length === 0) {
+                    const active = [...document.querySelectorAll(`[data-group="${group}"].active`)]
+                        .map(b => b.dataset.value).filter(v => v !== '');
+                    if (active.length === 0) {
                         if (allBtn) allBtn.classList.add('active');
                         document.getElementById(`${group}-value`).value = '';
                     } else {
-                        document.getElementById(`${group}-value`).value = activeValues.join(',');
+                        document.getElementById(`${group}-value`).value = active.join(',');
                     }
                 }
             }
-
             updateFilterSummary();
+            // 科目パネルが開いていれば再取得
+            if (currentDay && currentPeriod) openPanel(currentDay, currentPeriod);
         }
 
         function updateFilterSummary() {
             const year = document.getElementById('year-value').value;
             const field = document.getElementById('field-value').value;
             const regtype = document.getElementById('regtype-value').value;
-
             document.getElementById('filter-summary').textContent =
                 `${year}回生 / ${field || '全科目'} / ${regtype || '全区分'}`;
         }
-    </script>
 
+        // ── サイドパネル ────────────────────────────────
+        let currentDay = null;
+        let currentPeriod = null;
+
+        function openPanel(day, period) {
+            currentDay = day;
+            currentPeriod = period;
+            const year = document.getElementById('year-value').value;
+            const cat = document.getElementById('field-value').value;
+            const reg = document.getElementById('regtype-value').value;
+
+            let url = `/api/subjects/${day}/${period}?year=${year}`;
+            if (cat) url += `&cat=${encodeURIComponent(cat)}`;
+            if (reg) url += `&reg=${encodeURIComponent(reg)}`;
+
+            const panel = document.getElementById('side-panel');
+            const content = document.getElementById('panel-content');
+            panel.classList.remove('hidden');
+            panel.classList.add('flex');
+            content.innerHTML = '<p class="text-sm text-muted text-center py-12">読み込み中…</p>';
+
+            htmx.ajax('GET', url, { target: '#panel-content', swap: 'innerHTML' });
+        }
+
+        function closePanel() {
+            document.getElementById('side-panel').classList.add('hidden');
+            document.getElementById('side-panel').classList.remove('flex');
+            document.getElementById('panel-content').innerHTML =
+                '<p class="text-sm text-muted text-center py-12">コマをクリックして<br>科目を表示します</p>';
+            currentDay = null;
+            currentPeriod = null;
+        }
+
+        // 解除後にセルのクリックイベントを復活させる
+        function restoreClick(day, period) {
+            const cell = document.getElementById(`cell-${day}-${period}`);
+            if (cell) {
+                cell.setAttribute('onclick', `openPanel('${day}', ${period})`);
+            }
+        }
+
+        // HTMX で登録後、セルの onclick を無効化（登録済みセルはクリック不要）
+        document.body.addEventListener('htmx:afterSwap', function (e) {
+            const target = e.detail.target;
+            if (target && target.id && target.id.startsWith('cell-')) {
+                const hasCard = target.querySelector('.enrolled-card');
+                if (hasCard) {
+                    target.removeAttribute('onclick');
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>

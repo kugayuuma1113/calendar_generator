@@ -122,3 +122,148 @@ body {
     font-weight: 600;
     margin-bottom: 8px;
 }
+
+/* ── Enrolled Card（セル内の科目カード）── */
+.enrolled-card {
+    padding: 6px 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    height: 100%;
+    min-height: 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* ── 分野ごとの背景色 ── */
+.cat-bg-外国語 {
+    background: rgba(108, 99, 255, 0.25);
+    border-color: rgba(108, 99, 255, 0.4);
+}
+
+.cat-bg-基礎専門 {
+    background: rgba(72, 202, 228, 0.20);
+    border-color: rgba(72, 202, 228, 0.4);
+}
+
+.cat-bg-固有専門 {
+    background: rgba(251, 191, 36, 0.20);
+    border-color: rgba(251, 191, 36, 0.4);
+}
+
+.cat-bg-教養 {
+    background: rgba(52, 211, 153, 0.20);
+    border-color: rgba(52, 211, 153, 0.4);
+}
+
+.cat-bg-共通専門 {
+    background: rgba(251, 146, 60, 0.20);
+    border-color: rgba(251, 146, 60, 0.4);
+}
+
+.cat-bg-注意事項参照 {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* ── 解除ボタン ── */
+.unenroll-btn {
+    -webkit-appearance: none;
+    appearance: none;
+    font-size: 0.65rem;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: rgba(239, 68, 68, 0.9);
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.unenroll-btn:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+}
+
+/* ── 科目一覧パネル（Aside）── */
+#side-panel {
+    max-height: calc(100vh - 260px);
+    position: sticky;
+    top: 1rem;
+}
+
+#panel-content {
+    overflow-y: auto;
+    max-height: calc(100vh - 320px);
+}
+
+/* ── 科目カード（パネル内）── */
+.subject-card {
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(48, 54, 61, 0.8);
+    background: rgba(22, 27, 34, 0.5);
+    transition: border-color 0.15s;
+}
+
+.subject-card:hover {
+    border-color: rgba(108, 99, 255, 0.4);
+}
+
+/* ── 登録ボタン ── */
+.enroll-btn {
+    font-size: 0.75rem;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, rgba(108, 99, 255, 0.4), rgba(72, 202, 228, 0.3));
+    border: 1px solid rgba(108, 99, 255, 0.5);
+    color: #e6e6ff;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+}
+
+.enroll-btn:hover {
+    background: linear-gradient(135deg, rgba(108, 99, 255, 0.6), rgba(72, 202, 228, 0.5));
+    box-shadow: 0 0 10px rgba(108, 99, 255, 0.3);
+}
+
+/* ── 分野バッジ ── */
+.cat-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 9999px;
+    font-size: 0.65rem;
+    font-weight: 600;
+}
+
+.cat-外国語 {
+    background: rgba(108, 99, 255, 0.25);
+    color: #a5a0ff;
+}
+
+.cat-基礎専門 {
+    background: rgba(72, 202, 228, 0.20);
+    color: #67e8f9;
+}
+
+.cat-固有専門 {
+    background: rgba(251, 191, 36, 0.20);
+    color: #fde68a;
+}
+
+.cat-教養 {
+    background: rgba(52, 211, 153, 0.20);
+    color: #6ee7b7;
+}
+
+.cat-共通専門 {
+    background: rgba(251, 146, 60, 0.20);
+    color: #fed7aa;
+}
+
+.cat-注意事項参照 {
+    background: rgba(239, 68, 68, 0.15);
+    color: #fca5a5;
+}

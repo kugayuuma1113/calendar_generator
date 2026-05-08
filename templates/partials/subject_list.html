@@ -1,0 +1,34 @@
+{# セルクリック時に右パネルへ差し込まれる科目リスト #}
+<div class="p-4">
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="text-sm font-semibold text-slate-200">
+            {{ day }}曜 {{ period }}時限 の科目
+        </h3>
+        <span class="text-xs text-muted">{{ subjects|length }} 件</span>
+    </div>
+
+    {% if subjects %}
+    <ul class="space-y-2">
+        {% for s in subjects %}
+        <li class="subject-card" data-cat="{{ s.cat }}">
+            <div class="flex items-start justify-between gap-2">
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-slate-200 truncate">{{ s.name }}</p>
+                    <p class="text-xs text-muted mt-0.5">
+                        <span class="cat-badge cat-{{ s.cat }}">{{ s.cat }}</span>
+                        <span class="ml-1">{{ s.reg }}</span>
+                    </p>
+                </div>
+                <form hx-post="/api/enrollment" hx-target="#cell-{{ day_key }}-{{ period }}" hx-swap="innerHTML"
+                    hx-on::after-request="if(event.detail.successful) closePanel()">
+                    <input type="hidden" name="subject_id" value="{{ s.id }}">
+                    <button type="submit" class="enroll-btn">登録</button>
+                </form>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="text-sm text-muted text-center py-8">該当する科目がありません</p>
+    {% endif %}
+</div>

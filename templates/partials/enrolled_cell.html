@@ -1,0 +1,10 @@
+{# 履修登録成功後にセルへ差し込まれる科目カード #}
+<div class="enrolled-card cat-bg-{{ enrolled.cat }}">
+    <p class="text-xs font-semibold leading-tight truncate text-slate-100">{{ enrolled.name }}</p>
+    <p class="text-xs mt-0.5 truncate text-slate-400">{{ enrolled.cat }}</p>
+    <form hx-delete="/api/enrollment/{{ enrolled.enrollment_id }}"
+        hx-target="#cell-{{ enrolled.day | replace('月','mon') | replace('火','tue') | replace('水','wed') | replace('木','thu') | replace('金','fri') }}-{{ enrolled.period }}"
+        hx-swap="innerHTML" hx-confirm="「{{ enrolled.name }}」の履修を解除しますか？" class="mt-1">
+        <button type="submit" class="unenroll-btn">解除</button>
+    </form>
+</div>
