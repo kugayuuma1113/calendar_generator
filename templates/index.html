@@ -129,8 +129,12 @@
                 <span class="text-xs text-muted" id="filter-summary">1回生 / 全科目 / 全区分</span>
             </div>
 
-            <div class="overflow-x-auto p-4">
-                <table class="w-full border-collapse" style="min-width: 600px;">
+            <div class="overflow-x-auto p-4 timetable-grid">
+                <table class="w-full border-collapse table-fixed" style="min-width: 600px;">
+                    <colgroup>
+                        <col class="w-24" />
+                        <col span="5" />
+                    </colgroup>
                     <thead>
                         <tr>
                             <th class="header-period w-24 rounded-tl-lg p-4 text-center">時限</th>
@@ -161,8 +165,7 @@
                             {% set enrolled = enrolled_map.get((day_jp, period_num)) %}
                             <td id="cell-{{ day_key }}-{{ period_num }}"
                                 class="timetable-cell p-2 {% if loop.last and period_num == 5 %}rounded-br-lg{% endif %}"
-                                data-day="{{ day_key }}" data-period="{{ period_num }}" {% if not enrolled %}
-                                onclick="openPanel('{{ day_key }}', {{ period_num }})" {% endif %}>
+                                data-day="{{ day_key }}" data-period="{{ period_num }}">
                                 {% if enrolled %}
                                 <div class="enrolled-card cat-bg-{{ enrolled.cat }}">
                                     <p class="text-xs font-semibold leading-tight truncate text-slate-100">{{
@@ -171,7 +174,6 @@
                                     <form hx-delete="/api/enrollment/{{ enrolled.enrollment_id }}"
                                         hx-target="#cell-{{ day_key }}-{{ period_num }}" hx-swap="innerHTML"
                                         hx-confirm="「{{ enrolled.name }}」の履修を解除しますか？"
-                                        hx-on::after-request="if(event.detail.successful) restoreClick('{{ day_key }}', {{ period_num }})"
                                         class="mt-1">
                                         <button type="submit" class="unenroll-btn">解除</button>
                                     </form>
@@ -296,23 +298,13 @@
             currentPeriod = null;
         }
 
-        // 解除後にセルのクリックイベントを復活させる
-        function restoreClick(day, period) {
-            const cell = document.getElementById(`cell-${day}-${period}`);
-            if (cell) {
-                cell.setAttribute('onclick', `openPanel('${day}', ${period})`);
-            }
-        }
-
-        // HTMX で登録後、セルの onclick を無効化（登録済みセルはクリック不要）
-        document.body.addEventListener('htmx:afterSwap', function (e) {
-            const target = e.detail.target;
-            if (target && target.id && target.id.startsWith('cell-')) {
-                const hasCard = target.querySelector('.enrolled-card');
-                if (hasCard) {
-                    target.removeAttribute('onclick');
-                }
-            }
+        // 空きコマクリックで科目パネルを開く（登録済みセルは除外）
+        document.querySelector('.timetable-grid')?.addEventListener('click', function (e) {
+            const cell = e.target.closest('.timetable-cell');
+            if (!cell || cell.querySelector('.enrolled-card')) return;
+            const day = cell.dataset.day;
+            const period = parseInt(cell.dataset.period, 10);
+            if (day && period) openPanel(day, period);
         });
     </script>
 </body>

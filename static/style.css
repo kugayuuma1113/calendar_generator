@@ -52,6 +52,7 @@ body {
     background: rgba(22, 27, 34, 0.5);
     cursor: pointer;
     position: relative;
+    overflow: hidden;
 }
 
 .timetable-cell:hover {
@@ -130,6 +131,8 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.1);
     height: 100%;
     min-height: 90px;
+    min-width: 0;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
