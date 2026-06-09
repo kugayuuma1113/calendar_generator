@@ -13,7 +13,9 @@ FastAPI + HTMX + SQLite（SQLModel）を使用しています。
   - 回生：1 / 2 / 3 / 4（排他選択）
   - 科目分野：外国語 / 基礎専門 / 固有専門 / 教養 / 全て（複数選択可）
   - 登録区分：事務室登録 / 抽選 / その他 / 全て（複数選択可）
+- **科目検索**: 科目名・授業コードで検索し、結果から履修登録できる
 - **履修登録**: 各コマをクリックすると科目一覧が表示され、履修登録・解除ができる
+- **履修一覧・サマリー**: 登録済み科目、曜日別・分野別・登録区分別の件数を表示できる
 - **PDF 取り込み**（`/import`）: 時間割 PDF をアップロードし、プレビュー確認後に科目マスタを登録
 
 ### バックエンド（`main.py`）
@@ -25,7 +27,9 @@ FastAPI + HTMX + SQLite（SQLModel）を使用しています。
 | `/api/import/confirm` | POST | プレビュー内容で科目マスタを全置換 |
 | `/api/import/cancel` | POST | プレビューを破棄 |
 | `/api/subjects/{day}/{period}` | GET | 指定コマの科目一覧を HTML フラグメントで返す |
+| `/api/subjects/search` | GET | 科目名・授業コード検索の結果を HTML フラグメントで返す |
 | `/api/enrollment` | GET | 履修中の全科目を JSON で返す |
+| `/api/enrollment/summary` | GET | 履修一覧・サマリーを HTML フラグメントで返す |
 | `/api/enrollment` | POST | 履修登録する |
 | `/api/enrollment/{enrollment_id}` | DELETE | 履修解除する |
 
@@ -84,6 +88,8 @@ calendar_generator/
 │   ├── import.html         # PDF 取り込みページ
 │   └── partials/
 │       ├── subject_list.html
+│       ├── search_results.html
+│       ├── enrollment_summary.html
 │       ├── enrolled_cell.html
 │       ├── import_preview.html
 │       └── import_success.html

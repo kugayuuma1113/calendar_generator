@@ -28,6 +28,36 @@ templates = Jinja2Templates(directory="templates")
 
 # 曜日マッピング（URL用 → DB用）
 DAY_MAP = {"mon": "月", "tue": "火", "wed": "水", "thu": "木", "fri": "金"}
+REVERSE_DAY_MAP = {value: key for key, value in DAY_MAP.items()}
+DAY_ORDER = ["月", "火", "水", "木", "金"]
+
+
+def parse_multi_value(value: str | None) -> list[str] | None:
+    if not value:
+        return None
+    values = [item.strip() for item in value.split(",") if item.strip()]
+    return values or None
+
+
+def build_enrollment_summary(enrollments: list[dict]) -> dict:
+    by_cat: dict[str, int] = {}
+    by_reg: dict[str, int] = {}
+    by_day: dict[str, int] = {day: 0 for day in DAY_ORDER}
+
+    for enrollment in enrollments:
+        cat = enrollment["cat"] or "未分類"
+        reg = enrollment["reg"] or "その他"
+        by_cat[cat] = by_cat.get(cat, 0) + 1
+        by_reg[reg] = by_reg.get(reg, 0) + 1
+        if enrollment["day"] in by_day:
+            by_day[enrollment["day"]] += 1
+
+    return {
+        "total": len(enrollments),
+        "by_cat": by_cat,
+        "by_reg": by_reg,
+        "by_day": by_day,
+    }
 
 
 @app.on_event("startup")
@@ -88,13 +118,44 @@ async def get_subjects_for_cell(
     HTMX がセルクリックで呼び出し、右パネルに差し込む。
     """
     jp_day = DAY_MAP.get(day, day)
+    cats = parse_multi_value(cat)
+    regs = parse_multi_value(reg)
     subjects = crud.get_subjects(
-        db, day=jp_day, period=period, year=year, cat=cat, reg=reg
+        db, day=jp_day, period=period, year=year, cats=cats, regs=regs
     )
     return templates.TemplateResponse(
         request,
         "partials/subject_list.html",
         {"subjects": subjects, "day": jp_day, "period": period, "day_key": day},
+    )
+
+
+@app.get("/api/subjects/search", response_class=HTMLResponse)
+async def search_subjects(
+    request: Request,
+    q: str = "",
+    year: Optional[int] = 1,
+    cat: Optional[str] = None,
+    reg: Optional[str] = None,
+    db: Session = Depends(get_session),
+):
+    """科目名・授業コードで科目を検索し、HTML フラグメントで返す。"""
+    query = q.strip()
+    subjects = crud.search_subjects(
+        db,
+        query=query,
+        year=year,
+        cats=parse_multi_value(cat),
+        regs=parse_multi_value(reg),
+    )
+    return templates.TemplateResponse(
+        request,
+        "partials/search_results.html",
+        {
+            "subjects": subjects,
+            "query": query,
+            "day_key_map": REVERSE_DAY_MAP,
+        },
     )
 
 
@@ -107,6 +168,28 @@ async def get_subjects_for_cell(
 async def list_enrollments(db: Session = Depends(get_session)):
     """履修中の全科目を JSON で返す"""
     return crud.get_enrollments(db)
+
+
+@app.get("/api/enrollment/summary", response_class=HTMLResponse)
+async def enrollment_summary(request: Request, db: Session = Depends(get_session)):
+    """履修一覧とサマリーを HTML フラグメントで返す"""
+    enrollments = crud.get_enrollments(db)
+    enrollments.sort(
+        key=lambda e: (
+            DAY_ORDER.index(e["day"]) if e["day"] in DAY_ORDER else len(DAY_ORDER),
+            e["period"],
+            e["code"],
+        )
+    )
+    return templates.TemplateResponse(
+        request,
+        "partials/enrollment_summary.html",
+        {
+            "enrollments": enrollments,
+            "summary": build_enrollment_summary(enrollments),
+            "day_key_map": REVERSE_DAY_MAP,
+        },
+    )
 
 
 @app.post("/api/enrollment", response_class=HTMLResponse)

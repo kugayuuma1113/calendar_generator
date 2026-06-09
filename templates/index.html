@@ -46,6 +46,10 @@
                     <p class="text-muted text-sm ml-10">大学履修管理システム — University Schedule Manager</p>
                 </div>
                 <div class="flex items-center gap-4">
+                    <button type="button" onclick="showEnrollmentSummary()"
+                        class="text-sm px-4 py-2 rounded-full border border-border text-muted hover:text-slate-200 hover:border-primary/50 transition-colors">
+                        履修一覧
+                    </button>
                     <a href="/import"
                         class="text-sm px-4 py-2 rounded-full border border-border text-muted hover:text-slate-200 hover:border-primary/50 transition-colors">
                         📥 科目データ取り込み
@@ -66,7 +70,7 @@
     <section class="max-w-screen-2xl mx-auto mb-4">
         <div class="glass rounded-2xl px-8 py-5">
             <div class="glow-line mb-5"></div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
 
                 <!-- 回生フィルター -->
                 <div>
@@ -116,6 +120,17 @@
                             onclick="toggleFilter(this, 'regtype', false)">全て</button>
                     </div>
                     <input type="hidden" name="regtype" id="regtype-value" value="">
+                </div>
+
+                <!-- 科目検索 -->
+                <div>
+                    <div class="filter-section-title">🔎 科目検索</div>
+                    <div class="flex gap-2">
+                        <input type="search" id="subject-search-input" class="search-input flex-1 min-w-0"
+                            placeholder="科目名・授業コード" autocomplete="off"
+                            onkeydown="if(event.key === 'Enter') { event.preventDefault(); searchSubjects(); }">
+                        <button type="button" class="search-btn" onclick="searchSubjects()">検索</button>
+                    </div>
                 </div>
             </div>
             <div class="glow-line mt-5"></div>
@@ -217,7 +232,7 @@
         <!-- Side Panel: 科目選択 -->
         <aside id="side-panel" class="glass rounded-2xl w-80 flex-shrink-0 hidden flex-col">
             <div class="px-4 py-3 border-b border-border flex items-center justify-between">
-                <span class="text-sm font-semibold text-slate-200">科目を選択</span>
+                <span id="panel-title" class="text-sm font-semibold text-slate-200">科目を選択</span>
                 <button onclick="closePanel()"
                     class="text-muted hover:text-slate-200 transition-colors text-xl leading-none">✕</button>
             </div>
@@ -271,6 +286,18 @@
                 `${year}回生 / ${field || '全科目'} / ${regtype || '全区分'}`;
         }
 
+        function buildSubjectQueryParams() {
+            const params = new URLSearchParams();
+            params.set('year', document.getElementById('year-value').value);
+
+            const cat = document.getElementById('field-value').value;
+            const reg = document.getElementById('regtype-value').value;
+            if (cat) params.set('cat', cat);
+            if (reg) params.set('reg', reg);
+
+            return params;
+        }
+
         // ── サイドパネル ────────────────────────────────
         let currentDay = null;
         let currentPeriod = null;
@@ -278,16 +305,12 @@
         function openPanel(day, period) {
             currentDay = day;
             currentPeriod = period;
-            const year = document.getElementById('year-value').value;
-            const cat = document.getElementById('field-value').value;
-            const reg = document.getElementById('regtype-value').value;
-
-            let url = `/api/subjects/${day}/${period}?year=${year}`;
-            if (cat) url += `&cat=${encodeURIComponent(cat)}`;
-            if (reg) url += `&reg=${encodeURIComponent(reg)}`;
+            const params = buildSubjectQueryParams();
+            const url = `/api/subjects/${day}/${period}?${params.toString()}`;
 
             const panel = document.getElementById('side-panel');
             const content = document.getElementById('panel-content');
+            document.getElementById('panel-title').textContent = '科目を選択';
             panel.classList.remove('hidden');
             panel.classList.add('flex');
             content.innerHTML = '<p class="text-sm text-muted text-center py-12">読み込み中…</p>';
@@ -295,9 +318,48 @@
             htmx.ajax('GET', url, { target: '#panel-content', swap: 'innerHTML' });
         }
 
+        function searchSubjects() {
+            currentDay = null;
+            currentPeriod = null;
+
+            const query = document.getElementById('subject-search-input').value.trim();
+            const params = buildSubjectQueryParams();
+            params.set('q', query);
+
+            const panel = document.getElementById('side-panel');
+            const content = document.getElementById('panel-content');
+            document.getElementById('panel-title').textContent = '科目検索';
+            panel.classList.remove('hidden');
+            panel.classList.add('flex');
+            content.innerHTML = '<p class="text-sm text-muted text-center py-12">検索中…</p>';
+
+            htmx.ajax('GET', `/api/subjects/search?${params.toString()}`, {
+                target: '#panel-content',
+                swap: 'innerHTML',
+            });
+        }
+
+        function showEnrollmentSummary() {
+            currentDay = null;
+            currentPeriod = null;
+
+            const panel = document.getElementById('side-panel');
+            const content = document.getElementById('panel-content');
+            document.getElementById('panel-title').textContent = '履修一覧';
+            panel.classList.remove('hidden');
+            panel.classList.add('flex');
+            content.innerHTML = '<p class="text-sm text-muted text-center py-12">読み込み中…</p>';
+
+            htmx.ajax('GET', '/api/enrollment/summary', {
+                target: '#panel-content',
+                swap: 'innerHTML',
+            });
+        }
+
         function closePanel() {
             document.getElementById('side-panel').classList.add('hidden');
             document.getElementById('side-panel').classList.remove('flex');
+            document.getElementById('panel-title').textContent = '科目を選択';
             document.getElementById('panel-content').innerHTML =
                 '<p class="text-sm text-muted text-center py-12">コマをクリックして<br>科目を表示します</p>';
             currentDay = null;
