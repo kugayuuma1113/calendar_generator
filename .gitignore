@@ -12,6 +12,9 @@ wheels/
 # Database
 *.db
 
+# PDF import preview cache
+data/import_previews/
+
 # PDF
 *.pdf
 

@@ -14,11 +14,16 @@ FastAPI + HTMX + SQLite（SQLModel）を使用しています。
   - 科目分野：外国語 / 基礎専門 / 固有専門 / 教養 / 全て（複数選択可）
   - 登録区分：事務室登録 / 抽選 / その他 / 全て（複数選択可）
 - **履修登録**: 各コマをクリックすると科目一覧が表示され、履修登録・解除ができる
+- **PDF 取り込み**（`/import`）: 時間割 PDF をアップロードし、プレビュー確認後に科目マスタを登録
 
 ### バックエンド（`main.py`）
 | エンドポイント | メソッド | 説明 |
 |---|---|---|
 | `/` | GET | 時間割ページ（HTML）を返す |
+| `/import` | GET | PDF 取り込みページ |
+| `/api/import/preview` | POST | PDF をパースしプレビュー HTML を返す |
+| `/api/import/confirm` | POST | プレビュー内容で科目マスタを全置換 |
+| `/api/import/cancel` | POST | プレビューを破棄 |
 | `/api/subjects/{day}/{period}` | GET | 指定コマの科目一覧を HTML フラグメントで返す |
 | `/api/enrollment` | GET | 履修中の全科目を JSON で返す |
 | `/api/enrollment` | POST | 履修登録する |
@@ -38,36 +43,59 @@ FastAPI + HTMX + SQLite（SQLModel）を使用しています。
 # 依存パッケージのインストール
 uv sync
 
-科目データの作成（初回のみ）
-scripts/table.pdf（時間割 PDF）を配置し、SQLite データベース database.db に科目データを登録します。
-
-uv run python -m scripts.create_data_pdf
-PDF の 2〜6 ページ目がそれぞれ月〜金の時間割表に対応します。
-再実行すると重複登録される可能性があるため、初回または DB をリセットした後に実行してください。
-
-scripts/create_data.py を使うと、コード内に定義したサンプル科目データを手動で登録することもできます。
-
-サーバー起動
+# サーバー起動
 uv run uvicorn main:app --host 0.0.0.0 --port 8000
+```
+
 起動後、ブラウザで http://localhost:8000 を開くと時間割表が表示されます。
 
-プロジェクト構成（主要ファイル）
+### 科目データの登録
 
+**Web から（推奨）**
+
+1. http://localhost:8000/import を開く
+2. 時間割 PDF をアップロード
+3. ページ指定（月曜の開始ページから連番、または曜日ごとに指定）
+4. プレビューで内容を確認し「取り込みを確定」
+
+確定時は既存の科目マスタを**すべて置き換え**、履修登録も**すべて解除**されます。
+
+**CLI から（従来どおり）**
+
+`scripts/table.pdf` を配置して実行します（Web 取り込みと同じパーサを使用、既存データは置き換え）。
+
+```bash
+uv run python -m scripts.create_data_pdf
+```
+
+PDF の 2〜6 ページ目がそれぞれ月〜金に対応する想定です（開始ページ 2）。
+
+`scripts/create_data.py` ではサンプル科目を手動登録できます。
+
+---
+
+## プロジェクト構成（主要ファイル）
+
+```
 calendar_generator/
 ├── main.py                 # FastAPI アプリ本体
-├── index.html              # 旧スタンドアロン版 HTML（現行アプリからは未使用）
 ├── templates/
-│   ├── index.html          # 時間割ページのテンプレート（Jinja2）
+│   ├── index.html          # 時間割ページ
+│   ├── import.html         # PDF 取り込みページ
 │   └── partials/
-│       ├── subject_list.html   # 科目一覧（サイドパネル）用テンプレート
-│       └── enrolled_cell.html  # 履修済みセル表示用テンプレート
-├── static/
-│   └── style.css           # カスタム CSS
-├── scripts/
-│   ├── create_data.py          # サンプル科目データを DB に登録
-│   └── create_data_pdf.py      # PDF から科目データを DB に登録
+│       ├── subject_list.html
+│       ├── enrolled_cell.html
+│       ├── import_preview.html
+│       └── import_success.html
+├── static/style.css
 ├── app/
-│   ├── models.py           # Subject / Enrollment モデル定義
-│   ├── database.py         # DB 接続・セッション管理
-│   └── crud.py             # 科目・履修に関する DB 操作
-└── role.md                 # 各ファイルの役割一覧（このプロジェクト用メモ）
+│   ├── models.py
+│   ├── database.py
+│   ├── crud.py
+│   ├── pdf_parser.py       # PDF パース（Web / CLI 共通）
+│   └── import_store.py     # プレビュー一時保存
+├── scripts/
+│   ├── create_data.py
+│   └── create_data_pdf.py
+└── data/import_previews/   # プレビュー用（git 管理外）
+```

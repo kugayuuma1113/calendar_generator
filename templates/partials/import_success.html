@@ -1,0 +1,19 @@
+<div class="glass rounded-2xl px-8 py-6 border border-emerald-500/30 bg-emerald-500/5">
+    <h2 class="text-lg font-semibold text-emerald-200 mb-2">取り込みが完了しました</h2>
+    <p class="text-sm text-slate-300 mb-4">
+        科目マスタ <span class="font-semibold text-slate-100">{{ count }}</span> 件を登録しました。
+        {% if cleared_enrollments > 0 %}
+        履修登録 {{ cleared_enrollments }} 件を解除しました。
+        {% endif %}
+    </p>
+    <div class="flex flex-wrap gap-3">
+        <a href="/"
+            class="inline-block px-6 py-2.5 rounded-xl bg-primary/30 border border-primary/50 text-slate-100 text-sm font-medium hover:bg-primary/40 transition-colors">
+            時間割を開く
+        </a>
+        <a href="/import"
+            class="inline-block px-6 py-2.5 rounded-xl border border-border text-muted text-sm hover:text-slate-200 transition-colors">
+            別の PDF を取り込む
+        </a>
+    </div>
+</div>
