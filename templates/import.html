@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>科目データ取り込み — 時間割Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6C63FF',
+                        secondary: '#48CAE4',
+                        dark: '#0D1117',
+                        surface: '#161B22',
+                        card: '#21262D',
+                        border: '#30363D',
+                        muted: '#8B949E',
+                    },
+                    fontFamily: {
+                        sans: ['"Inter"', '"Noto Sans JP"', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.10/dist/htmx.min.js"
+        integrity="sha384-H5SrcfygHmAuTDZphMHqBJLc3FhssKjG7w/CeCpFReSfwBWDTKpkzPP8c+cLsK+V"
+        crossorigin="anonymous"></script>
+</head>
+
+<body class="font-sans py-6 px-4">
+
+    <header class="max-w-screen-xl mx-auto mb-6">
+        <div class="glass rounded-2xl px-8 py-5">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <div>
+                    <div class="flex items-center gap-3 mb-1">
+                        <span class="text-2xl">📥</span>
+                        <h1 class="text-2xl font-bold title-gradient">科目データ取り込み</h1>
+                    </div>
+                    <p class="text-muted text-sm ml-10">時間割 PDF から科目マスタを登録します</p>
+                </div>
+                <a href="/"
+                    class="text-sm px-4 py-2 rounded-full border border-border text-muted hover:text-slate-200 hover:border-primary/50 transition-colors">
+                    ← 時間割に戻る
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-screen-xl mx-auto space-y-6">
+
+        {% if subject_count > 0 %}
+        <div class="glass rounded-xl px-6 py-4 border border-border/80">
+            <p class="text-sm text-muted">
+                現在の科目マスタ: <span class="text-slate-200 font-medium">{{ subject_count }} 件</span>
+                {% if enrollment_count > 0 %}
+                · 履修登録: <span class="text-amber-300/90">{{ enrollment_count }} 件</span>
+                <span class="text-muted">（取り込み確定時に履修はすべて解除されます）</span>
+                {% endif %}
+            </p>
+        </div>
+        {% endif %}
+
+        <section class="glass rounded-2xl px-8 py-6">
+            <h2 class="text-lg font-semibold text-slate-200 mb-4">1. PDF をアップロード</h2>
+
+            <form id="import-form" hx-post="/api/import/preview" hx-target="#preview-area" hx-swap="innerHTML"
+                hx-encoding="multipart/form-data" hx-indicator="#preview-loading"
+                class="space-y-6">
+
+                <div>
+                    <label class="block text-sm text-muted mb-2">時間割 PDF ファイル</label>
+                    <input type="file" name="pdf_file" accept="application/pdf,.pdf" required
+                        class="block w-full text-sm text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary/20 file:text-slate-200 hover:file:bg-primary/30 cursor-pointer">
+                </div>
+
+                <div>
+                    <label class="block text-sm text-muted mb-3">ページの指定方法</label>
+                    <div class="flex flex-wrap gap-4 mb-4">
+                        <label class="flex items-center gap-2 cursor-pointer text-sm text-slate-300">
+                            <input type="radio" name="page_mode" value="sequential" checked
+                                onchange="togglePageMode()" class="accent-primary">
+                            開始ページから連番（月→金）
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer text-sm text-slate-300">
+                            <input type="radio" name="page_mode" value="individual"
+                                onchange="togglePageMode()" class="accent-primary">
+                            曜日ごとに指定
+                        </label>
+                    </div>
+
+                    <div id="page-sequential" class="flex items-center gap-3 flex-wrap">
+                        <span class="text-sm text-muted">月曜のページ（1 始まり）</span>
+                        <input type="number" name="start_page" value="2" min="1" max="999"
+                            class="import-page-input w-20">
+                        <span class="text-xs text-muted">火〜金は続くページを自動で使用します</span>
+                    </div>
+
+                    <div id="page-individual" class="hidden grid grid-cols-2 sm:grid-cols-5 gap-3">
+                        {% for day in ['月', '火', '水', '木', '金'] %}
+                        <div>
+                            <label class="block text-xs text-muted mb-1">{{ day }}曜</label>
+                            <input type="number" name="page_{{ day }}" value="{{ loop.index + 1 }}" min="1" max="999"
+                                class="import-page-input w-full" disabled>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <p class="text-xs text-muted leading-relaxed">
+                    取り込みは大学の時間割 PDF 形式（表の列レイアウト）に依存します。プレビューで内容を確認してから確定してください。
+                </p>
+
+                <button type="submit"
+                    class="px-6 py-2.5 rounded-xl bg-primary/30 border border-primary/50 text-slate-100 text-sm font-medium hover:bg-primary/40 transition-colors">
+                    プレビューを表示
+                </button>
+            </form>
+
+            <div id="preview-loading" class="htmx-indicator mt-4 text-sm text-muted">読み込み中…</div>
+        </section>
+
+        <section id="preview-area" class="min-h-[2rem]">
+            <p class="text-sm text-muted text-center py-8">PDF を選択して「プレビューを表示」を押してください</p>
+        </section>
+    </main>
+
+    <footer class="max-w-screen-xl mx-auto mt-8 text-center text-xs text-muted opacity-50">
+        時間割Generator &nbsp;·&nbsp; Phase 1 — PDF 取り込み
+    </footer>
+
+    <script>
+        function togglePageMode() {
+            const mode = document.querySelector('input[name="page_mode"]:checked').value;
+            const seq = document.getElementById('page-sequential');
+            const ind = document.getElementById('page-individual');
+            const seqInput = document.querySelector('input[name="start_page"]');
+            const indInputs = ind.querySelectorAll('input[type="number"]');
+
+            if (mode === 'sequential') {
+                seq.classList.remove('hidden');
+                ind.classList.add('hidden');
+                seqInput.disabled = false;
+                indInputs.forEach(i => { i.disabled = true; });
+            } else {
+                seq.classList.add('hidden');
+                ind.classList.remove('hidden');
+                seqInput.disabled = true;
+                indInputs.forEach(i => { i.disabled = false; });
+            }
+        }
+        togglePageMode();
+    </script>
+</body>
+
+</html>

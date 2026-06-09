@@ -27,6 +27,26 @@ def get_subjects(
     return db.exec(stmt).all()
 
 
+def count_subjects(db: Session) -> int:
+    """科目マスタの件数を返す。"""
+    return len(db.exec(select(Subject)).all())
+
+
+def replace_all_subjects(db: Session, subjects_data: list[dict]) -> int:
+    """
+    科目マスタを全置換する。履修登録はすべて解除される。
+    取り込み確定時に使用する。
+    """
+    for enrollment in db.exec(select(Enrollment)).all():
+        db.delete(enrollment)
+    for subject in db.exec(select(Subject)).all():
+        db.delete(subject)
+    for data in subjects_data:
+        db.add(Subject(**data))
+    db.commit()
+    return len(subjects_data)
+
+
 def get_all_subjects(
     db: Session,
     year: int | None = None,

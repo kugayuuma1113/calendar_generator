@@ -270,3 +270,33 @@ body {
     background: rgba(239, 68, 68, 0.15);
     color: #fca5a5;
 }
+
+/* ── PDF Import ── */
+.import-page-input {
+    background: rgba(22, 27, 34, 0.8);
+    border: 1px solid rgba(48, 54, 61, 0.8);
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    color: #e6edf3;
+    font-size: 0.875rem;
+}
+
+.import-page-input:focus {
+    outline: none;
+    border-color: rgba(108, 99, 255, 0.6);
+    box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.15);
+}
+
+.import-preview-table th,
+.import-preview-table td {
+    white-space: nowrap;
+}
+
+.htmx-indicator {
+    display: none;
+}
+
+.htmx-request .htmx-indicator,
+.htmx-request.htmx-indicator {
+    display: block;
+}
