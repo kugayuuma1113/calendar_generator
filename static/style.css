@@ -257,14 +257,14 @@ button.search-btn:hover {
 
 /* ── 科目一覧パネル（Aside）── */
 #side-panel {
-    max-height: calc(100vh - 260px);
+    max-height: calc(100vh - 170px);
     position: sticky;
     top: 1rem;
 }
 
 #panel-content {
     overflow-y: auto;
-    max-height: calc(100vh - 320px);
+    max-height: calc(100vh - 225px);
 }
 
 /* ── 科目カード（パネル内）── */
@@ -482,4 +482,193 @@ button.search-btn:hover {
 .htmx-request .htmx-indicator,
 .htmx-request.htmx-indicator {
     display: block;
+}
+
+/* ── Light Theme ── */
+html.theme-light-preload body,
+body.theme-light {
+    background-color: #F4F7FB;
+    background-image:
+        radial-gradient(ellipse at 18% 45%, rgba(108, 99, 255, 0.12) 0%, transparent 48%),
+        radial-gradient(ellipse at 82% 12%, rgba(14, 165, 233, 0.12) 0%, transparent 42%);
+    color: #172033;
+}
+
+body.theme-light .glass {
+    background: rgba(255, 255, 255, 0.88);
+    border-color: rgba(203, 213, 225, 0.9);
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+}
+
+body.theme-light .text-muted,
+body.theme-light .filter-section-title,
+body.theme-light .period-time,
+body.theme-light #filter-summary,
+body.theme-light footer {
+    color: #64748b !important;
+}
+
+body.theme-light .text-slate-100,
+body.theme-light .text-slate-200,
+body.theme-light .text-slate-300 {
+    color: #1e293b !important;
+}
+
+body.theme-light .border-border {
+    border-color: rgba(203, 213, 225, 0.95) !important;
+}
+
+body.theme-light .filter-btn {
+    background: rgba(248, 250, 252, 0.86);
+    border-color: rgba(203, 213, 225, 0.95);
+    color: #64748b;
+}
+
+body.theme-light .filter-btn:hover {
+    background: rgba(108, 99, 255, 0.09);
+    border-color: rgba(108, 99, 255, 0.38);
+    color: #334155;
+}
+
+body.theme-light .filter-btn.active {
+    background: linear-gradient(135deg, rgba(108, 99, 255, 0.2), rgba(14, 165, 233, 0.14));
+    border-color: rgba(108, 99, 255, 0.58);
+    color: #3730a3;
+    box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.08);
+}
+
+body.theme-light .search-control {
+    background: rgba(248, 250, 252, 0.9) !important;
+    border-color: rgba(203, 213, 225, 0.95) !important;
+}
+
+body.theme-light .search-control input.search-input,
+body.theme-light input#subject-search-input.search-input {
+    color: #172033 !important;
+}
+
+body.theme-light .search-control input.search-input::placeholder,
+body.theme-light input#subject-search-input.search-input::placeholder {
+    color: #94a3b8;
+}
+
+body.theme-light .search-control button.search-btn,
+body.theme-light button.search-btn {
+    background: rgba(108, 99, 255, 0.12) !important;
+    border-color: rgba(108, 99, 255, 0.32) !important;
+    color: #3730a3 !important;
+}
+
+body.theme-light .search-control button.search-btn:hover,
+body.theme-light button.search-btn:hover {
+    background: rgba(108, 99, 255, 0.2) !important;
+}
+
+body.theme-light .timetable-cell {
+    background: rgba(248, 250, 252, 0.74);
+    border-color: rgba(203, 213, 225, 0.86);
+}
+
+body.theme-light .timetable-cell:hover {
+    background: rgba(108, 99, 255, 0.08);
+    border-color: rgba(108, 99, 255, 0.34);
+}
+
+body.theme-light .header-day {
+    background: rgba(108, 99, 255, 0.14);
+    border-color: rgba(108, 99, 255, 0.22);
+    color: #3730a3;
+}
+
+body.theme-light .header-period {
+    background: rgba(241, 245, 249, 0.9);
+    border-color: rgba(203, 213, 225, 0.86);
+    color: #64748b;
+}
+
+body.theme-light .add-icon {
+    color: rgba(108, 99, 255, 0.45);
+}
+
+body.theme-light .subject-card {
+    background: rgba(248, 250, 252, 0.86);
+    border-color: rgba(203, 213, 225, 0.9);
+}
+
+body.theme-light .subject-card:hover {
+    border-color: rgba(108, 99, 255, 0.36);
+}
+
+body.theme-light .summary-total {
+    background: rgba(108, 99, 255, 0.1);
+    border-color: rgba(108, 99, 255, 0.22);
+}
+
+body.theme-light .summary-section,
+body.theme-light .summary-chip {
+    background: rgba(248, 250, 252, 0.82);
+    border-color: rgba(203, 213, 225, 0.9);
+}
+
+body.theme-light .summary-total-label,
+body.theme-light .summary-title,
+body.theme-light .summary-chip span,
+body.theme-light .summary-count,
+body.theme-light .enrollment-list-count,
+body.theme-light .enrollment-subject-meta,
+body.theme-light .enrollment-subject-detail,
+body.theme-light .enrollment-empty {
+    color: #64748b;
+}
+
+body.theme-light .summary-total-count,
+body.theme-light .summary-chip strong,
+body.theme-light .summary-row,
+body.theme-light .summary-label,
+body.theme-light .enrollment-list-title,
+body.theme-light .enrollment-subject-name {
+    color: #172033;
+}
+
+body.theme-light .cat-bg-外国語,
+body.theme-light .cat-bg-基礎専門,
+body.theme-light .cat-bg-固有専門,
+body.theme-light .cat-bg-教養,
+body.theme-light .cat-bg-共通専門,
+body.theme-light .cat-bg-注意事項参照 {
+    color: #172033;
+}
+
+body.theme-light .cat-bg-外国語 {
+    background: rgba(108, 99, 255, 0.18);
+}
+
+body.theme-light .cat-bg-基礎専門 {
+    background: rgba(6, 182, 212, 0.18);
+}
+
+body.theme-light .cat-bg-固有専門 {
+    background: rgba(245, 158, 11, 0.2);
+}
+
+body.theme-light .cat-bg-教養 {
+    background: rgba(16, 185, 129, 0.18);
+}
+
+body.theme-light .cat-bg-共通専門 {
+    background: rgba(249, 115, 22, 0.18);
+}
+
+body.theme-light .cat-bg-注意事項参照 {
+    background: rgba(239, 68, 68, 0.12);
+}
+
+body.theme-light .unenroll-btn {
+    border-color: rgba(220, 38, 38, 0.42);
+    color: #dc2626;
+}
+
+body.theme-light .unenroll-btn:hover {
+    background: rgba(220, 38, 38, 0.1);
+    color: #b91c1c;
 }

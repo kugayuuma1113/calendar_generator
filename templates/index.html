@@ -26,7 +26,12 @@
             }
         }
     </script>
-    <link rel="stylesheet" href="/static/style.css?v=20260610-ui2">
+    <script>
+        if (localStorage.getItem('calendar-theme') === 'light') {
+            document.documentElement.classList.add('theme-light-preload');
+        }
+    </script>
+    <link rel="stylesheet" href="/static/style.css?v=20260610-theme">
     <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.10/dist/htmx.min.js"
         integrity="sha384-H5SrcfygHmAuTDZphMHqBJLc3FhssKjG7w/CeCpFReSfwBWDTKpkzPP8c+cLsK+V"
         crossorigin="anonymous"></script>
@@ -46,6 +51,10 @@
                     <p class="text-muted text-sm ml-10">大学履修管理システム — University Schedule Manager</p>
                 </div>
                 <div class="flex items-center gap-4">
+                    <button type="button" id="theme-toggle" onclick="toggleTheme()"
+                        class="text-sm px-4 py-2 rounded-full border border-border text-muted hover:text-slate-200 hover:border-primary/50 transition-colors">
+                        ライト
+                    </button>
                     <button type="button" onclick="showEnrollmentSummary()"
                         class="text-sm px-4 py-2 rounded-full border border-border text-muted hover:text-slate-200 hover:border-primary/50 transition-colors">
                         履修一覧
@@ -247,6 +256,22 @@
     </footer>
 
     <script>
+        function applyTheme(theme) {
+            const isLight = theme === 'light';
+            document.body.classList.toggle('theme-light', isLight);
+            document.documentElement.classList.toggle('theme-light-preload', isLight);
+            const toggle = document.getElementById('theme-toggle');
+            if (toggle) toggle.textContent = isLight ? 'ダーク' : 'ライト';
+        }
+
+        function toggleTheme() {
+            const nextTheme = document.body.classList.contains('theme-light') ? 'dark' : 'light';
+            localStorage.setItem('calendar-theme', nextTheme);
+            applyTheme(nextTheme);
+        }
+
+        applyTheme(localStorage.getItem('calendar-theme') || 'dark');
+
         // ── フィルター ──────────────────────────────────
         function toggleFilter(btn, group, isExclusive) {
             const groupBtns = document.querySelectorAll(`[data-group="${group}"]`);
