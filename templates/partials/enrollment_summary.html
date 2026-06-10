@@ -1,9 +1,9 @@
 {# 履修一覧・サマリーとして右パネルへ差し込まれる表示 #}
 <div class="p-4 space-y-4">
     <div class="summary-total">
-        <span class="text-xs text-muted">履修登録</span>
-        <span class="text-2xl font-semibold text-slate-100">{{ summary.total }}</span>
-        <span class="text-xs text-muted">件</span>
+        <span class="summary-total-label">履修登録</span>
+        <span class="summary-total-count">{{ summary.total }}</span>
+        <span class="summary-total-label">件</span>
     </div>
 
     <div class="summary-section">
@@ -25,7 +25,7 @@
             {% for cat, count in summary.by_cat.items() %}
             <div class="summary-row">
                 <span class="cat-badge cat-{{ cat }}">{{ cat }}</span>
-                <span>{{ count }} 件</span>
+                <span class="summary-count">{{ count }} 件</span>
             </div>
             {% endfor %}
         </div>
@@ -38,8 +38,8 @@
         <div class="space-y-2">
             {% for reg, count in summary.by_reg.items() %}
             <div class="summary-row">
-                <span class="truncate">{{ reg }}</span>
-                <span>{{ count }} 件</span>
+                <span class="summary-label truncate">{{ reg }}</span>
+                <span class="summary-count">{{ count }} 件</span>
             </div>
             {% endfor %}
         </div>
@@ -48,8 +48,8 @@
 
     <div>
         <div class="flex items-center justify-between mb-3">
-            <h3 class="text-sm font-semibold text-slate-200">履修科目</h3>
-            <span class="text-xs text-muted">{{ enrollments|length }} 件</span>
+            <h3 class="enrollment-list-title">履修科目</h3>
+            <span class="enrollment-list-count">{{ enrollments|length }} 件</span>
         </div>
 
         {% if enrollments %}
@@ -59,12 +59,12 @@
             <li class="subject-card">
                 <div class="flex items-start justify-between gap-2">
                     <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium text-slate-200 truncate">{{ e.name }}</p>
-                        <p class="text-xs text-muted mt-0.5">
+                        <p class="enrollment-subject-name truncate">{{ e.name }}</p>
+                        <p class="enrollment-subject-meta">
                             <span class="cat-badge cat-{{ e.cat }}">{{ e.cat }}</span>
                             <span class="ml-1">{{ e.day }}曜 {{ e.period }}時限</span>
                         </p>
-                        <p class="text-xs text-muted mt-1 truncate">
+                        <p class="enrollment-subject-detail truncate">
                             <span class="font-mono">{{ e.code }}</span>
                             {% if e.reg %}
                             <span class="ml-1">{{ e.reg }}</span>
@@ -82,7 +82,7 @@
             {% endfor %}
         </ul>
         {% else %}
-        <p class="text-sm text-muted text-center py-8">履修登録された科目はありません</p>
+        <p class="enrollment-empty">履修登録された科目はありません</p>
         {% endif %}
     </div>
 </div>

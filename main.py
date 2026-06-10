@@ -91,10 +91,23 @@ async def read_root(request: Request, db: Session = Depends(get_session)):
     enrollments = crud.get_enrollments(db)
     # {(day, period): enrollment_dict} の辞書に変換して Jinja2 で参照しやすくする
     enrolled_map = {(e["day"], e["period"]): e for e in enrollments}
+    summary_enrollments = sorted(
+        enrollments,
+        key=lambda e: (
+            DAY_ORDER.index(e["day"]) if e["day"] in DAY_ORDER else len(DAY_ORDER),
+            e["period"],
+            e["code"],
+        ),
+    )
     return templates.TemplateResponse(
         request,
         "index.html",
-        {"enrolled_map": enrolled_map},
+        {
+            "enrolled_map": enrolled_map,
+            "enrollments": summary_enrollments,
+            "summary": build_enrollment_summary(summary_enrollments),
+            "day_key_map": REVERSE_DAY_MAP,
+        },
     )
 
 
