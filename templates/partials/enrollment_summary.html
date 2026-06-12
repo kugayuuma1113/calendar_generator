@@ -1,0 +1,88 @@
+{# 履修一覧・サマリーとして右パネルへ差し込まれる表示 #}
+<div class="p-4 space-y-4">
+    <div class="summary-total">
+        <span class="summary-total-label">履修登録</span>
+        <span class="summary-total-count">{{ summary.total }}</span>
+        <span class="summary-total-label">件</span>
+    </div>
+
+    <div class="summary-section">
+        <div class="summary-title">曜日別</div>
+        <div class="summary-grid">
+            {% for day, count in summary.by_day.items() %}
+            <div class="summary-chip">
+                <span>{{ day }}</span>
+                <strong>{{ count }}</strong>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if summary.by_cat %}
+    <div class="summary-section">
+        <div class="summary-title">分野別</div>
+        <div class="space-y-2">
+            {% for cat, count in summary.by_cat.items() %}
+            <div class="summary-row">
+                <span class="cat-badge cat-{{ cat }}">{{ cat }}</span>
+                <span class="summary-count">{{ count }} 件</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if summary.by_reg %}
+    <div class="summary-section">
+        <div class="summary-title">登録区分別</div>
+        <div class="space-y-2">
+            {% for reg, count in summary.by_reg.items() %}
+            <div class="summary-row">
+                <span class="summary-label truncate">{{ reg }}</span>
+                <span class="summary-count">{{ count }} 件</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div>
+        <div class="flex items-center justify-between mb-3">
+            <h3 class="enrollment-list-title">履修科目</h3>
+            <span class="enrollment-list-count">{{ enrollments|length }} 件</span>
+        </div>
+
+        {% if enrollments %}
+        <ul class="space-y-2">
+            {% for e in enrollments %}
+            {% set day_key = day_key_map.get(e.day, e.day) %}
+            <li class="subject-card">
+                <div class="flex items-start justify-between gap-2">
+                    <div class="flex-1 min-w-0">
+                        <p class="enrollment-subject-name truncate">{{ e.name }}</p>
+                        <p class="enrollment-subject-meta">
+                            <span class="cat-badge cat-{{ e.cat }}">{{ e.cat }}</span>
+                            <span class="ml-1">{{ e.day }}曜 {{ e.period }}時限</span>
+                        </p>
+                        <p class="enrollment-subject-detail truncate">
+                            <span class="font-mono">{{ e.code }}</span>
+                            {% if e.reg %}
+                            <span class="ml-1">{{ e.reg }}</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <form hx-delete="/api/enrollment/{{ e.enrollment_id }}"
+                        hx-target="#cell-{{ day_key }}-{{ e.period }}" hx-swap="innerHTML"
+                        hx-confirm="「{{ e.name }}」の履修を解除しますか？"
+                        hx-on::after-request="if(event.detail.successful) showEnrollmentSummary()">
+                        <button type="submit" class="unenroll-btn">解除</button>
+                    </form>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="enrollment-empty">履修登録された科目はありません</p>
+        {% endif %}
+    </div>
+</div>

@@ -1,0 +1,43 @@
+{# 科目検索結果として右パネルへ差し込まれるリスト #}
+<div class="p-4">
+    <div class="flex items-center justify-between mb-4 gap-3">
+        <h3 class="text-sm font-semibold text-slate-200 truncate">
+            「{{ query }}」の検索結果
+        </h3>
+        <span class="text-xs text-muted flex-shrink-0">{{ subjects|length }} 件</span>
+    </div>
+
+    {% if subjects %}
+    <ul class="space-y-2">
+        {% for s in subjects %}
+        {% set day_key = day_key_map.get(s.day, s.day) %}
+        <li class="subject-card" data-cat="{{ s.cat }}">
+            <div class="flex items-start justify-between gap-2">
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-slate-200 truncate">{{ s.name }}</p>
+                    <p class="text-xs text-muted mt-0.5">
+                        <span class="cat-badge cat-{{ s.cat }}">{{ s.cat }}</span>
+                        <span class="ml-1">{{ s.day }}曜 {{ s.period }}時限</span>
+                    </p>
+                    <p class="text-xs text-muted mt-1 truncate">
+                        <span class="font-mono">{{ s.code }}</span>
+                        {% if s.reg %}
+                        <span class="ml-1">{{ s.reg }}</span>
+                        {% endif %}
+                    </p>
+                </div>
+                <form hx-post="/api/enrollment" hx-target="#cell-{{ day_key }}-{{ s.period }}" hx-swap="innerHTML"
+                    hx-on::after-request="if(event.detail.successful) closePanel()">
+                    <input type="hidden" name="subject_id" value="{{ s.id }}">
+                    <button type="submit" class="enroll-btn">登録</button>
+                </form>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% elif query %}
+    <p class="text-sm text-muted text-center py-8">該当する科目がありません</p>
+    {% else %}
+    <p class="text-sm text-muted text-center py-8">科目名または授業コードを入力してください</p>
+    {% endif %}
+</div>

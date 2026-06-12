@@ -1,6 +1,30 @@
+from sqlalchemy import or_
 from sqlmodel import Session, select
 
 from app.models import Enrollment, Subject
+
+REG_OTHER_EXCLUDES = ["事務室登録", "抽選"]
+
+
+def _apply_subject_filters(
+    stmt,
+    year: int | None = None,
+    cats: list[str] | None = None,
+    regs: list[str] | None = None,
+):
+    if year is not None:
+        stmt = stmt.where(Subject.year <= year)
+    if cats:
+        stmt = stmt.where(Subject.cat.in_(cats))
+    if regs:
+        direct_regs = [reg for reg in regs if reg != "その他"]
+        reg_conditions = []
+        if direct_regs:
+            reg_conditions.append(Subject.reg.in_(direct_regs))
+        if "その他" in regs:
+            reg_conditions.append(~Subject.reg.in_(REG_OTHER_EXCLUDES))
+        stmt = stmt.where(or_(*reg_conditions))
+    return stmt
 
 
 # ────────────────────────────────────────
@@ -12,18 +36,13 @@ def get_subjects(
     day: str,
     period: int,
     year: int | None = None,
-    cat: str | None = None,
-    reg: str | None = None,
+    cats: list[str] | None = None,
+    regs: list[str] | None = None,
 ) -> list[Subject]:
     """指定した曜日・時限・フィルター条件に合う科目を返す。
     year は「N回生以上が受講可能」を意味するため <= で絞る。"""
     stmt = select(Subject).where(Subject.day == day, Subject.period == period)
-    if year is not None:
-        stmt = stmt.where(Subject.year <= year)
-    if cat:
-        stmt = stmt.where(Subject.cat == cat)
-    if reg:
-        stmt = stmt.where(Subject.reg == reg)
+    stmt = _apply_subject_filters(stmt, year=year, cats=cats, regs=regs)
     return db.exec(stmt).all()
 
 
@@ -50,18 +69,36 @@ def replace_all_subjects(db: Session, subjects_data: list[dict]) -> int:
 def get_all_subjects(
     db: Session,
     year: int | None = None,
-    cat: str | None = None,
-    reg: str | None = None,
+    cats: list[str] | None = None,
+    regs: list[str] | None = None,
 ) -> list[Subject]:
     """フィルター条件に合う全科目を返す（フィルターパネル用）。
     year は「N回生以上が受講可能」を意味するため <= で絞る。"""
     stmt = select(Subject)
-    if year is not None:
-        stmt = stmt.where(Subject.year <= year)
-    if cat:
-        stmt = stmt.where(Subject.cat == cat)
-    if reg:
-        stmt = stmt.where(Subject.reg == reg)
+    stmt = _apply_subject_filters(stmt, year=year, cats=cats, regs=regs)
+    return db.exec(stmt).all()
+
+
+def search_subjects(
+    db: Session,
+    query: str,
+    year: int | None = None,
+    cats: list[str] | None = None,
+    regs: list[str] | None = None,
+) -> list[Subject]:
+    """科目名または授業コードで科目を検索する。"""
+    normalized_query = query.strip()
+    if not normalized_query:
+        return []
+
+    stmt = select(Subject).where(
+        or_(
+            Subject.name.contains(normalized_query),
+            Subject.code.contains(normalized_query),
+        )
+    )
+    stmt = _apply_subject_filters(stmt, year=year, cats=cats, regs=regs)
+    stmt = stmt.order_by(Subject.day, Subject.period, Subject.code)
     return db.exec(stmt).all()
 
 

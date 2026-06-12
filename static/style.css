@@ -44,10 +44,77 @@ body {
     box-shadow: 0 0 12px rgba(108, 99, 255, 0.25);
 }
 
+/* ── Search Control ── */
+.search-control {
+    align-items: center;
+    background: rgba(33, 38, 45, 0.6) !important;
+    border: 1px solid rgba(48, 54, 61, 0.8) !important;
+    border-radius: 9999px;
+    display: flex;
+    gap: 0.35rem;
+    padding: 0.25rem;
+}
+
+.search-control input.search-input,
+input#subject-search-input.search-input {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 9999px;
+    color: #e6edf3 !important;
+    font-size: 0.85rem;
+    height: 2rem;
+    min-width: 0;
+    padding: 0 0.75rem;
+}
+
+.search-control input.search-input::placeholder,
+input#subject-search-input.search-input::placeholder {
+    color: #6e7681;
+    opacity: 1;
+}
+
+.search-control input.search-input:focus,
+input#subject-search-input.search-input:focus {
+    background: transparent !important;
+    box-shadow: none !important;
+    outline: none;
+}
+
+.search-control input.search-input::-webkit-search-decoration,
+.search-control input.search-input::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+}
+
+.search-control button.search-btn,
+button.search-btn {
+    -webkit-appearance: none;
+    appearance: none;
+    border: 1px solid rgba(108, 99, 255, 0.45) !important;
+    background: rgba(108, 99, 255, 0.18) !important;
+    border-radius: 9999px;
+    color: #e6e6ff !important;
+    cursor: pointer;
+    flex-shrink: 0;
+    font-size: 0.78rem;
+    font-weight: 500;
+    height: 2rem;
+    padding: 0 0.85rem;
+    transition: all 0.15s ease;
+}
+
+.search-control button.search-btn:hover,
+button.search-btn:hover {
+    background: rgba(108, 99, 255, 0.3) !important;
+    border-color: rgba(108, 99, 255, 0.7);
+}
+
 /* ── Timetable Cells ── */
 .timetable-cell {
     border: 1px solid rgba(48, 54, 61, 0.6);
-    min-height: 110px;
+    height: 150px;
+    min-height: 150px;
     transition: all 0.2s ease;
     background: rgba(22, 27, 34, 0.5);
     cursor: pointer;
@@ -130,7 +197,7 @@ body {
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     height: 100%;
-    min-height: 90px;
+    min-height: 130px;
     min-width: 0;
     overflow: hidden;
     display: flex;
@@ -190,14 +257,14 @@ body {
 
 /* ── 科目一覧パネル（Aside）── */
 #side-panel {
-    max-height: calc(100vh - 260px);
+    max-height: calc(100vh - 170px);
     position: sticky;
     top: 1rem;
 }
 
 #panel-content {
     overflow-y: auto;
-    max-height: calc(100vh - 320px);
+    max-height: calc(100vh - 225px);
 }
 
 /* ── 科目カード（パネル内）── */
@@ -211,6 +278,122 @@ body {
 
 .subject-card:hover {
     border-color: rgba(108, 99, 255, 0.4);
+}
+
+/* ── 履修サマリー ── */
+.summary-total {
+    align-items: baseline;
+    background: rgba(108, 99, 255, 0.12);
+    border: 1px solid rgba(108, 99, 255, 0.28);
+    border-radius: 0.75rem;
+    display: flex;
+    gap: 0.45rem;
+    padding: 0.85rem 1rem;
+}
+
+.summary-total-label {
+    color: #8B949E;
+    font-size: 0.75rem;
+}
+
+.summary-total-count {
+    color: #e6edf3;
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.summary-section {
+    background: rgba(22, 27, 34, 0.28);
+    border: 1px solid rgba(48, 54, 61, 0.8);
+    border-radius: 0.75rem;
+    padding: 0.85rem;
+}
+
+.summary-title {
+    color: #8B949E;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.6rem;
+}
+
+.summary-grid {
+    display: grid;
+    gap: 0.5rem;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.summary-chip {
+    align-items: center;
+    background: rgba(22, 27, 34, 0.65);
+    border: 1px solid rgba(48, 54, 61, 0.75);
+    border-radius: 0.55rem;
+    color: #8B949E;
+    display: flex;
+    flex-direction: column;
+    font-size: 0.72rem;
+    gap: 0.15rem;
+    padding: 0.45rem 0.2rem;
+}
+
+.summary-chip span {
+    color: #8B949E;
+}
+
+.summary-chip strong {
+    color: #e6edf3;
+    font-size: 0.95rem;
+}
+
+.summary-row {
+    align-items: center;
+    color: #c9d1d9;
+    display: flex;
+    font-size: 0.78rem;
+    gap: 0.75rem;
+    justify-content: space-between;
+    min-width: 0;
+}
+
+.summary-label {
+    color: #c9d1d9;
+}
+
+.summary-count {
+    color: #8B949E;
+    flex-shrink: 0;
+}
+
+.enrollment-list-title {
+    color: #e6edf3;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.enrollment-list-count {
+    color: #8B949E;
+    font-size: 0.75rem;
+}
+
+.enrollment-subject-name {
+    color: #e6edf3;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.enrollment-subject-meta,
+.enrollment-subject-detail {
+    color: #8B949E;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+.enrollment-empty {
+    color: #8B949E;
+    font-size: 0.875rem;
+    padding: 2rem 0;
+    text-align: center;
 }
 
 /* ── 登録ボタン ── */
@@ -299,4 +482,193 @@ body {
 .htmx-request .htmx-indicator,
 .htmx-request.htmx-indicator {
     display: block;
+}
+
+/* ── Light Theme ── */
+html.theme-light-preload body,
+body.theme-light {
+    background-color: #F4F7FB;
+    background-image:
+        radial-gradient(ellipse at 18% 45%, rgba(108, 99, 255, 0.12) 0%, transparent 48%),
+        radial-gradient(ellipse at 82% 12%, rgba(14, 165, 233, 0.12) 0%, transparent 42%);
+    color: #172033;
+}
+
+body.theme-light .glass {
+    background: rgba(255, 255, 255, 0.88);
+    border-color: rgba(203, 213, 225, 0.9);
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+}
+
+body.theme-light .text-muted,
+body.theme-light .filter-section-title,
+body.theme-light .period-time,
+body.theme-light #filter-summary,
+body.theme-light footer {
+    color: #64748b !important;
+}
+
+body.theme-light .text-slate-100,
+body.theme-light .text-slate-200,
+body.theme-light .text-slate-300 {
+    color: #1e293b !important;
+}
+
+body.theme-light .border-border {
+    border-color: rgba(203, 213, 225, 0.95) !important;
+}
+
+body.theme-light .filter-btn {
+    background: rgba(248, 250, 252, 0.86);
+    border-color: rgba(203, 213, 225, 0.95);
+    color: #64748b;
+}
+
+body.theme-light .filter-btn:hover {
+    background: rgba(108, 99, 255, 0.09);
+    border-color: rgba(108, 99, 255, 0.38);
+    color: #334155;
+}
+
+body.theme-light .filter-btn.active {
+    background: linear-gradient(135deg, rgba(108, 99, 255, 0.2), rgba(14, 165, 233, 0.14));
+    border-color: rgba(108, 99, 255, 0.58);
+    color: #3730a3;
+    box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.08);
+}
+
+body.theme-light .search-control {
+    background: rgba(248, 250, 252, 0.9) !important;
+    border-color: rgba(203, 213, 225, 0.95) !important;
+}
+
+body.theme-light .search-control input.search-input,
+body.theme-light input#subject-search-input.search-input {
+    color: #172033 !important;
+}
+
+body.theme-light .search-control input.search-input::placeholder,
+body.theme-light input#subject-search-input.search-input::placeholder {
+    color: #94a3b8;
+}
+
+body.theme-light .search-control button.search-btn,
+body.theme-light button.search-btn {
+    background: rgba(108, 99, 255, 0.12) !important;
+    border-color: rgba(108, 99, 255, 0.32) !important;
+    color: #3730a3 !important;
+}
+
+body.theme-light .search-control button.search-btn:hover,
+body.theme-light button.search-btn:hover {
+    background: rgba(108, 99, 255, 0.2) !important;
+}
+
+body.theme-light .timetable-cell {
+    background: rgba(248, 250, 252, 0.74);
+    border-color: rgba(203, 213, 225, 0.86);
+}
+
+body.theme-light .timetable-cell:hover {
+    background: rgba(108, 99, 255, 0.08);
+    border-color: rgba(108, 99, 255, 0.34);
+}
+
+body.theme-light .header-day {
+    background: rgba(108, 99, 255, 0.14);
+    border-color: rgba(108, 99, 255, 0.22);
+    color: #3730a3;
+}
+
+body.theme-light .header-period {
+    background: rgba(241, 245, 249, 0.9);
+    border-color: rgba(203, 213, 225, 0.86);
+    color: #64748b;
+}
+
+body.theme-light .add-icon {
+    color: rgba(108, 99, 255, 0.45);
+}
+
+body.theme-light .subject-card {
+    background: rgba(248, 250, 252, 0.86);
+    border-color: rgba(203, 213, 225, 0.9);
+}
+
+body.theme-light .subject-card:hover {
+    border-color: rgba(108, 99, 255, 0.36);
+}
+
+body.theme-light .summary-total {
+    background: rgba(108, 99, 255, 0.1);
+    border-color: rgba(108, 99, 255, 0.22);
+}
+
+body.theme-light .summary-section,
+body.theme-light .summary-chip {
+    background: rgba(248, 250, 252, 0.82);
+    border-color: rgba(203, 213, 225, 0.9);
+}
+
+body.theme-light .summary-total-label,
+body.theme-light .summary-title,
+body.theme-light .summary-chip span,
+body.theme-light .summary-count,
+body.theme-light .enrollment-list-count,
+body.theme-light .enrollment-subject-meta,
+body.theme-light .enrollment-subject-detail,
+body.theme-light .enrollment-empty {
+    color: #64748b;
+}
+
+body.theme-light .summary-total-count,
+body.theme-light .summary-chip strong,
+body.theme-light .summary-row,
+body.theme-light .summary-label,
+body.theme-light .enrollment-list-title,
+body.theme-light .enrollment-subject-name {
+    color: #172033;
+}
+
+body.theme-light .cat-bg-外国語,
+body.theme-light .cat-bg-基礎専門,
+body.theme-light .cat-bg-固有専門,
+body.theme-light .cat-bg-教養,
+body.theme-light .cat-bg-共通専門,
+body.theme-light .cat-bg-注意事項参照 {
+    color: #172033;
+}
+
+body.theme-light .cat-bg-外国語 {
+    background: rgba(108, 99, 255, 0.18);
+}
+
+body.theme-light .cat-bg-基礎専門 {
+    background: rgba(6, 182, 212, 0.18);
+}
+
+body.theme-light .cat-bg-固有専門 {
+    background: rgba(245, 158, 11, 0.2);
+}
+
+body.theme-light .cat-bg-教養 {
+    background: rgba(16, 185, 129, 0.18);
+}
+
+body.theme-light .cat-bg-共通専門 {
+    background: rgba(249, 115, 22, 0.18);
+}
+
+body.theme-light .cat-bg-注意事項参照 {
+    background: rgba(239, 68, 68, 0.12);
+}
+
+body.theme-light .unenroll-btn {
+    border-color: rgba(220, 38, 38, 0.42);
+    color: #dc2626;
+}
+
+body.theme-light .unenroll-btn:hover {
+    background: rgba(220, 38, 38, 0.1);
+    color: #b91c1c;
 }
