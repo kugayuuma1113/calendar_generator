@@ -26,7 +26,12 @@
             }
         }
     </script>
-    <link rel="stylesheet" href="/static/style.css">
+    <script>
+        if (localStorage.getItem('calendar-theme') === 'light') {
+            document.documentElement.classList.add('theme-light-preload');
+        }
+    </script>
+    <link rel="stylesheet" href="/static/style.css?v=20260612-panel3">
     <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.10/dist/htmx.min.js"
         integrity="sha384-H5SrcfygHmAuTDZphMHqBJLc3FhssKjG7w/CeCpFReSfwBWDTKpkzPP8c+cLsK+V"
         crossorigin="anonymous"></script>
@@ -135,6 +140,12 @@
     </footer>
 
     <script>
+        function applyStoredTheme() {
+            const isLight = localStorage.getItem('calendar-theme') === 'light';
+            document.body.classList.toggle('theme-light', isLight);
+            document.documentElement.classList.toggle('theme-light-preload', isLight);
+        }
+
         function togglePageMode() {
             const mode = document.querySelector('input[name="page_mode"]:checked').value;
             const seq = document.getElementById('page-sequential');
@@ -154,6 +165,7 @@
                 indInputs.forEach(i => { i.disabled = false; });
             }
         }
+        applyStoredTheme();
         togglePageMode();
     </script>
 </body>

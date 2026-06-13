@@ -20,7 +20,7 @@
                     </p>
                 </div>
                 <form hx-post="/api/enrollment" hx-target="#cell-{{ day_key }}-{{ period }}" hx-swap="innerHTML"
-                    hx-on::after-request="if(event.detail.successful) closePanel()">
+                    hx-on::after-request="if(event.detail.successful) showEnrollmentSummary()">
                     <input type="hidden" name="subject_id" value="{{ s.id }}">
                     <button type="submit" class="enroll-btn">登録</button>
                 </form>

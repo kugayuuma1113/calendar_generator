@@ -257,14 +257,14 @@ button.search-btn:hover {
 
 /* ── 科目一覧パネル（Aside）── */
 #side-panel {
-    max-height: calc(100vh - 170px);
+    max-height: calc(100vh - 125px);
     position: sticky;
     top: 1rem;
 }
 
 #panel-content {
     overflow-y: auto;
-    max-height: calc(100vh - 225px);
+    max-height: calc(100vh - 180px);
 }
 
 /* ── 科目カード（パネル内）── */
@@ -562,6 +562,30 @@ body.theme-light button.search-btn {
 body.theme-light .search-control button.search-btn:hover,
 body.theme-light button.search-btn:hover {
     background: rgba(108, 99, 255, 0.2) !important;
+}
+
+body.theme-light .import-page-input {
+    background: rgba(248, 250, 252, 0.9);
+    border-color: rgba(203, 213, 225, 0.95);
+    color: #172033;
+}
+
+body.theme-light .import-page-input:focus {
+    border-color: rgba(108, 99, 255, 0.5);
+    box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.12);
+}
+
+body.theme-light input[type="file"] {
+    color: #334155;
+}
+
+body.theme-light input[type="file"]::file-selector-button {
+    background: rgba(108, 99, 255, 0.12);
+    color: #3730a3;
+}
+
+body.theme-light input[type="radio"] {
+    accent-color: #6C63FF;
 }
 
 body.theme-light .timetable-cell {

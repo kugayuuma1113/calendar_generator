@@ -31,7 +31,7 @@
             document.documentElement.classList.add('theme-light-preload');
         }
     </script>
-    <link rel="stylesheet" href="/static/style.css?v=20260610-theme">
+    <link rel="stylesheet" href="/static/style.css?v=20260612-panel3">
     <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.10/dist/htmx.min.js"
         integrity="sha384-H5SrcfygHmAuTDZphMHqBJLc3FhssKjG7w/CeCpFReSfwBWDTKpkzPP8c+cLsK+V"
         crossorigin="anonymous"></script>
@@ -107,6 +107,8 @@
                             onclick="toggleFilter(this, 'field', false)">基礎専門</button>
                         <button type="button" class="filter-btn" data-group="field" data-value="固有専門"
                             onclick="toggleFilter(this, 'field', false)">固有専門</button>
+                        <button type="button" class="filter-btn" data-group="field" data-value="共通専門"
+                            onclick="toggleFilter(this, 'field', false)">共通専門</button>
                         <button type="button" class="filter-btn" data-group="field" data-value="教養"
                             onclick="toggleFilter(this, 'field', false)">教養</button>
                         <button type="button" class="filter-btn active" data-group="field" data-value=""
@@ -230,6 +232,9 @@
                 </span>
                 <span class="flex items-center gap-2 text-xs text-muted">
                     <span class="inline-block w-3 h-3 rounded cat-bg-固有専門"></span>固有専門
+                </span>
+                <span class="flex items-center gap-2 text-xs text-muted">
+                    <span class="inline-block w-3 h-3 rounded cat-bg-共通専門"></span>共通専門
                 </span>
                 <span class="flex items-center gap-2 text-xs text-muted">
                     <span class="inline-block w-3 h-3 rounded cat-bg-教養"></span>教養
@@ -382,13 +387,7 @@
         }
 
         function closePanel() {
-            document.getElementById('side-panel').classList.add('hidden');
-            document.getElementById('side-panel').classList.remove('flex');
-            document.getElementById('panel-title').textContent = '科目を選択';
-            document.getElementById('panel-content').innerHTML =
-                '<p class="text-sm text-muted text-center py-12">コマをクリックして<br>科目を表示します</p>';
-            currentDay = null;
-            currentPeriod = null;
+            showEnrollmentSummary();
         }
 
         // 空きコマクリックで科目パネルを開く（登録済みセルは除外）
