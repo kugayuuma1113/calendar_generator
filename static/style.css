@@ -257,14 +257,14 @@ button.search-btn:hover {
 
 /* ── 科目一覧パネル（Aside）── */
 #side-panel {
-    max-height: calc(100vh - 125px);
+    max-height: calc(100vh - 110px);
     position: sticky;
     top: 1rem;
 }
 
 #panel-content {
     overflow-y: auto;
-    max-height: calc(100vh - 180px);
+    max-height: calc(100vh - 165px);
 }
 
 /* ── 科目カード（パネル内）── */
